@@ -1,0 +1,26 @@
+﻿@using ISIncidentTracker.Web.Models.Enums
+
+<div class="card border-primary mb-3">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">📊 Статистика инцидентов</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            @foreach (var stat in Statistics)
+            {
+                <div class="col-md-3 mb-2">
+                    <div class="text-center">
+                        <h6>@stat.Key</h6>
+                        <h3 class="text-primary">@stat.Value</h3>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Dictionary<IncidentSeverity, int> Statistics { get; set; }
+        = new Dictionary<IncidentSeverity, int>();
+}
