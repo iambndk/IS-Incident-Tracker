@@ -1,0 +1,120 @@
+﻿@page "/incidents/create"
+@using ISIncidentTracker.Web.Models
+@using ISIncidentTracker.Web.Models.Enums
+@using ISIncidentTracker.Web.Services.Interfaces
+@using ISIncidentTracker.Web.Data.Repositories.Interfaces
+@using FluentValidation
+@inject IIncidentService IncidentService
+@inject IRepository<Category> CategoryRepository
+@inject IRepository<User> UserRepository
+@inject NavigationManager NavigationManager
+@inject IValidator<Incident> Validator
+@rendermode InteractiveServer
+
+<PageTitle>Создание инцидента</PageTitle>
+
+<h1>Создание нового инцидента</h1>
+
+<div class="card">
+    <div class="card-body">
+        <EditForm Model="@incident" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Заголовок *</label>
+                        <InputText @bind-Value="incident.Title" class="form-control" />
+                        <ValidationMessage For="@(() => incident.Title)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Категория *</label>
+                        <InputSelect @bind-Value="incident.CategoryId" class="form-select">
+                            <option value="0">Выберите категорию</option>
+                            @foreach (var category in categories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => incident.CategoryId)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Критичность</label>
+                        <InputSelect @bind-Value="incident.Severity" class="form-select">
+                            @foreach (var value in Enum.GetValues<IncidentSeverity>())
+                            {
+                                <option value="@value">@value</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Сообщивший *</label>
+                        <InputSelect @bind-Value="incident.ReportedById" class="form-select">
+                            <option value="0">Выберите пользователя</option>
+                            @foreach (var user in users)
+                            {
+                                <option value="@user.Id">@user.FullName (@user.Username)</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => incident.ReportedById)" />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Дата возникновения</label>
+                        <InputDate @bind-Value="incident.OccurredDate" class="form-control" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Описание *</label>
+                        <InputTextArea @bind-Value="incident.Description" class="form-control" rows="5" />
+                        <ValidationMessage For="@(() => incident.Description)" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Создать инцидент
+                </button>
+                <a href="/incidents" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> Отмена
+                </a>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private Incident incident = new Incident();
+    private IEnumerable<Category> categories = new List<Category>();
+    private IEnumerable<User> users = new List<User>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Загружаем справочники
+        var categoryRepo = CategoryRepository;
+        var userRepo = UserRepository;
+        
+        categories = await categoryRepo.GetAllAsync();
+        users = await userRepo.GetAllAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await IncidentService.CreateIncidentAsync(incident);
+            NavigationManager.NavigateTo("/incidents");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка при создании инцидента: {ex.Message}");
+        }
+    }
+}

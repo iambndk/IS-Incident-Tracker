@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Сервис приложения
+  app:
+    image: whoisbndk/is-incident-tracker:1.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: is-incident-tracker-app
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/incidents.db;Cache=Shared
+    volumes:
+      # Volume для сохранения данных SQLite
+      - is-incident-tracker-data:/app/data
+      # Volume для логов (опционально)
+      - is-incident-tracker-logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - is-incident-tracker-network
+
+# Volumes для сохранения данных
+volumes:
+  is-incident-tracker-data:
+    driver: local
+    name: is-incident-tracker-data
+  is-incident-tracker-logs:
+    driver: local
+    name: is-incident-tracker-logs
+
+# Сеть для изоляции
+networks:
+  is-incident-tracker-network:
+    driver: bridge
+    name: is-incident-tracker-network

@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  app:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/incidents_dev.db;Cache=Shared
+    volumes:
+      - ./ISIncidentTracker.Web:/app:ro
