@@ -1,0 +1,249 @@
+﻿@page "/"
+@using ISIncidentTracker.Web.Models
+@using ISIncidentTracker.Web.Models.Enums
+@using ISIncidentTracker.Web.Services
+@using ISIncidentTracker.Web.Services.Interfaces
+@inject DashboardService DashboardService
+@rendermode InteractiveServer
+
+<PageTitle>Dashboard</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0 fw-semibold">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </h1>
+</div>
+
+@if (isLoading)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+        <p class="mt-3 text-muted">Загрузка данных...</p>
+    </div>
+}
+else if (kpi != null)
+{
+    <!-- KPI Карточки -->
+    <div class="row g-4 mb-4">
+        <!-- Всего инцидентов -->
+        <div class="col-md-3">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="kpi-label mb-1">Всего инцидентов</p>
+                        <p class="kpi-value mb-0">@kpi.TotalIncidents</p>
+                    </div>
+                    <i class="bi bi-list-ul display-4 text-muted opacity-25"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Критические -->
+        <div class="col-md-3">
+            <div class="kpi-card critical">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="kpi-label mb-1">Критические</p>
+                        <p class="kpi-value mb-0 text-danger">@kpi.CriticalCount</p>
+                    </div>
+                    <i class="bi bi-exclamation-triangle display-4 text-danger opacity-25"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Высокие -->
+        <div class="col-md-3">
+            <div class="kpi-card high">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="kpi-label mb-1">Высокие</p>
+                        <p class="kpi-value mb-0" style="color: #ffaa00;">@kpi.HighCount</p>
+                    </div>
+                    <i class="bi bi-arrow-up-circle display-4 opacity-25" style="color: #ffaa00;"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Средние -->
+        <div class="col-md-3">
+            <div class="kpi-card medium">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="kpi-label mb-1">Средние</p>
+                        <p class="kpi-value mb-0" style="color: #ffc107;">@kpi.MediumCount</p>
+                    </div>
+                    <i class="bi bi-minus-circle display-4 opacity-25" style="color: #ffc107;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Второй ряд: Низкие + В работе -->
+    <div class="row g-4 mb-4">
+        <!-- Низкие -->
+        <div class="col-md-3">
+            <div class="kpi-card low">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="kpi-label mb-1">Низкие</p>
+                        <p class="kpi-value mb-0" style="color: #198754;">@kpi.LowCount</p>
+                    </div>
+                    <i class="bi bi-arrow-down-circle display-4 opacity-25" style="color: #198754;"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- В работе -->
+        <div class="col-md-3">
+            <div class="kpi-card inprogress">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="kpi-label mb-1">В работе</p>
+                        <p class="kpi-value mb-0 text-warning">@kpi.InProgressCount</p>
+                    </div>
+                    <i class="bi bi-hourglass-split display-4 text-warning opacity-25"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Разрешенные -->
+        <div class="col-md-3">
+            <div class="kpi-card resolved">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="kpi-label mb-1">Разрешенные</p>
+                        <p class="kpi-value mb-0 text-success">@kpi.ResolvedCount</p>
+                    </div>
+                    <i class="bi bi-check-circle display-4 text-success opacity-25"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Закрытые -->
+        <div class="col-md-3">
+            <div class="kpi-card closed">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="kpi-label mb-1">Закрытые</p>
+                        <p class="kpi-value mb-0 text-secondary">@kpi.ClosedCount</p>
+                    </div>
+                    <i class="bi bi-archive display-4 text-secondary opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Последние инциденты -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-list-ul me-2"></i>Последние инциденты</span>
+            <a href="/incidents" class="btn btn-sm btn-light">Все инциденты</a>
+        </div>
+        <div class="card-body p-0">
+            @if (recentIncidents != null && recentIncidents.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Название</th>
+                                <th>Категория</th>
+                                <th>Уровень</th>
+                                <th>Статус</th>
+                                <th>Дата</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var incident in recentIncidents.Take(5))
+                            {
+                                <tr>
+                                    <td class="text-nowrap">
+                                        <span class="badge bg-secondary">#@incident.Id</span>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <span class="badge bg-info"
+                                              style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;"
+                                              title="@incident.Title">
+                                            @incident.Title
+                                        </span>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <span class="badge bg-secondary">@incident.Category?.Name</span>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <span class="badge @GetSeverityCssClass(incident.Severity)">
+                                            @incident.Severity
+                                        </span>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <span class="badge bg-info">@incident.Status</span>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <span class="badge bg-secondary">
+                                            @incident.ReportedDate.ToString("dd.MM.yyyy")
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox display-4 d-block mb-3"></i>
+                    <p>Инциденты отсутствуют</p>
+                    <a href="/incidents/create" class="btn btn-primary mt-2">Создать первый инцидент</a>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private DashboardKpi? kpi;
+    private IEnumerable<Incident>? recentIncidents;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardData();
+    }
+
+    private async Task LoadDashboardData()
+    {
+        isLoading = true;
+        StateHasChanged();
+        
+        try
+        {
+            kpi = await DashboardService.GetKpiAsync();
+            recentIncidents = await DashboardService.GetRecentIncidentsAsync(10);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка загрузки дашборда: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private string GetSeverityCssClass(IncidentSeverity severity)
+    {
+        return severity switch
+        {
+            IncidentSeverity.Critical => "bg-danger",
+            IncidentSeverity.High => "bg-orange",
+            IncidentSeverity.Medium => "bg-warning text-dark",
+            IncidentSeverity.Low => "bg-success",
+            _ => "bg-secondary"
+        };
+    }
+}   

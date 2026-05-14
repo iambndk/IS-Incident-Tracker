@@ -1,35 +1,45 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">IS Incident Tracker</a>
+﻿<div class="sidebar @(isCollapsed ? "collapsed" : "")">
+    <!-- Логотип и кнопка сворачивания -->
+    <div class="sidebar-header">
+        <i class="bi bi-shield-lock-fill logo-icon"></i>
+        <span class="logo-text">IS Tracker</span>
+        <button class="toggle-btn" @onclick="ToggleMenu">
+            <i class="bi @(isCollapsed ? "bi-list" : "bi-x-lg")"></i>
+        </button>
     </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
+    <div class="nav-scrollable">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill" aria-hidden="true"></span> Главная
+                <i class="bi bi-speedometer2"></i>
+                <span class="link-text">Dashboard</span>
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="incidents">
-                <span class="bi bi-list-task" aria-hidden="true"></span> Инциденты
+                <i class="bi bi-list-check"></i>
+                <span class="link-text">Инциденты</span>
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="incidents/create">
+                <i class="bi bi-plus-circle-dotted"></i>
+                <span class="link-text">Создать</span>
             </NavLink>
         </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-cloud-fill" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
+    </div>
 </div>
+
+@code {
+    private bool isCollapsed = false;
+    
+    [Parameter]  // ← ДОБАВИТЬ ЭТОТ АТРИБУТ!
+    public EventCallback OnToggle { get; set; }
+
+    private async Task ToggleMenu()
+    {
+        isCollapsed = !isCollapsed;
+        await OnToggle.InvokeAsync();
+    }
+}

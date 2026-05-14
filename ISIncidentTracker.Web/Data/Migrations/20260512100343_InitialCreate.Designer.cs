@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ISIncidentTracker.Web.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260511215344_InitialCreate")]
+    [Migration("20260512100343_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -41,6 +41,9 @@ namespace ISIncidentTracker.Web.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
                     b.HasIndex("Name")
                         .IsUnique();
 
@@ -50,37 +53,86 @@ namespace ISIncidentTracker.Web.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Code = "DATA_LEAK",
-                            Description = "Несанкционированная передача конфиденциальной информации",
-                            Name = "Утечка данных"
+                            Code = "PHISHING",
+                            Description = "Фишинговые атаки и поддельные письма",
+                            Name = "Фишинг"
                         },
                         new
                         {
                             Id = 2,
-                            Code = "DDOS",
-                            Description = "Атака типа 'отказ в обслуживании'",
-                            Name = "DDoS-атака"
+                            Code = "DATA_LEAK",
+                            Description = "Компрометация или утечка конфиденциальных данных",
+                            Name = "Утечка данных"
                         },
                         new
                         {
                             Id = 3,
-                            Code = "MALWARE",
-                            Description = "Обнаружение вирусов, троянов, шпионского ПО",
-                            Name = "Вредоносное ПО"
+                            Code = "DDOS",
+                            Description = "Распределённая атака типа 'отказ в обслуживании'",
+                            Name = "DDoS-атака"
                         },
                         new
                         {
                             Id = 4,
-                            Code = "UNAUTH_ACCESS",
-                            Description = "Попытка или факт несанкционированного входа",
-                            Name = "Несанкционированный доступ"
+                            Code = "MALWARE",
+                            Description = "Вирусы, трояны, шпионское ПО, ботнеты",
+                            Name = "Вредоносное ПО"
                         },
                         new
                         {
                             Id = 5,
-                            Code = "PHISHING",
-                            Description = "Попытка получения учетных данных через социальную инженерию",
-                            Name = "Фишинг"
+                            Code = "RANSOMWARE",
+                            Description = "Шифровальщики и программы-вымогатели",
+                            Name = "Ransomware"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Code = "UNAUTH_ACCESS",
+                            Description = "Попытка или факт несанкционированного входа в систему",
+                            Name = "Несанкционированный доступ"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Code = "DEVICE_LOSS",
+                            Description = "Утеря или кража корпоративного устройства",
+                            Name = "Потеря устройства"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Code = "POLICY_VIOLATION",
+                            Description = "Нарушение внутренних правил ИБ",
+                            Name = "Нарушение политик безопасности"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Code = "SQLI",
+                            Description = "Атаки внедрением вредоносного SQL-кода",
+                            Name = "SQL Injection"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Code = "XSS",
+                            Description = "Межсайтовый скриптинг и инъекции кода",
+                            Name = "XSS атака"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Code = "SOCIAL_ENG",
+                            Description = "Манипулирование персоналом для получения доступа",
+                            Name = "Социальная инженерия"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Code = "OTHER",
+                            Description = "Инциденты, не подпадающие под другие категории",
+                            Name = "Другое"
                         });
                 });
 
@@ -103,6 +155,9 @@ namespace ISIncidentTracker.Web.Data.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DueDate")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("OccurredDate")
@@ -153,7 +208,69 @@ namespace ISIncidentTracker.Web.Data.Migrations
 
                     b.HasIndex("Status");
 
+                    b.HasIndex("Title");
+
                     b.ToTable("Incidents");
+                });
+
+            modelBuilder.Entity("ISIncidentTracker.Web.Models.IncidentTag", b =>
+                {
+                    b.Property<int>("IncidentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("IncidentId", "TagId");
+
+                    b.HasIndex("IncidentId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("IncidentTags");
+                });
+
+            modelBuilder.Entity("ISIncidentTracker.Web.Models.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Tags");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Требует немедленного внимания",
+                            Name = "Срочно"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Затрагивает клиентские данные",
+                            Name = "Клиент"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Внутренний инцидент",
+                            Name = "Внутренний"
+                        });
                 });
 
             modelBuilder.Entity("ISIncidentTracker.Web.Models.User", b =>
@@ -194,6 +311,8 @@ namespace ISIncidentTracker.Web.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email");
+
                     b.HasIndex("Username")
                         .IsUnique();
 
@@ -203,7 +322,7 @@ namespace ISIncidentTracker.Web.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 5, 11, 21, 53, 43, 795, DateTimeKind.Utc).AddTicks(9544),
+                            CreatedAt = new DateTime(2026, 5, 12, 10, 3, 42, 697, DateTimeKind.Utc).AddTicks(4939),
                             Email = "admin@is-tracker.local",
                             FullName = "Администратор Системы",
                             IsActive = true,
@@ -213,7 +332,7 @@ namespace ISIncidentTracker.Web.Data.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2026, 5, 11, 21, 53, 43, 795, DateTimeKind.Utc).AddTicks(9546),
+                            CreatedAt = new DateTime(2026, 5, 12, 10, 3, 42, 697, DateTimeKind.Utc).AddTicks(4941),
                             Email = "analyst@is-tracker.local",
                             FullName = "Аналитик ИБ",
                             IsActive = true,
@@ -223,12 +342,22 @@ namespace ISIncidentTracker.Web.Data.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2026, 5, 11, 21, 53, 43, 795, DateTimeKind.Utc).AddTicks(9548),
+                            CreatedAt = new DateTime(2026, 5, 12, 10, 3, 42, 697, DateTimeKind.Utc).AddTicks(4942),
                             Email = "viewer@is-tracker.local",
                             FullName = "Наблюдатель",
                             IsActive = true,
                             Role = "Viewer",
                             Username = "viewer"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2026, 5, 12, 10, 3, 42, 697, DateTimeKind.Utc).AddTicks(4943),
+                            Email = "soc@is-tracker.local",
+                            FullName = "Оператор SOC",
+                            IsActive = true,
+                            Role = "Analyst",
+                            Username = "soc_operator"
                         });
                 });
 
@@ -238,21 +367,21 @@ namespace ISIncidentTracker.Web.Data.Migrations
                         .WithMany("AssignedIncidents")
                         .HasForeignKey("AssignedToId")
                         .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("FK_Incidents_Users_AssignedTo");
+                        .HasConstraintName("FK_Incidents_Users_AssignedToId");
 
                     b.HasOne("ISIncidentTracker.Web.Models.Category", "Category")
                         .WithMany("Incidents")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("FK_Incidents_Categories");
+                        .HasConstraintName("FK_Incidents_Categories_CategoryId");
 
                     b.HasOne("ISIncidentTracker.Web.Models.User", "ReportedBy")
                         .WithMany("ReportedIncidents")
                         .HasForeignKey("ReportedById")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("FK_Incidents_Users_ReportedBy");
+                        .HasConstraintName("FK_Incidents_Users_ReportedById");
 
                     b.Navigation("AssignedTo");
 
@@ -261,9 +390,40 @@ namespace ISIncidentTracker.Web.Data.Migrations
                     b.Navigation("ReportedBy");
                 });
 
+            modelBuilder.Entity("ISIncidentTracker.Web.Models.IncidentTag", b =>
+                {
+                    b.HasOne("ISIncidentTracker.Web.Models.Incident", "Incident")
+                        .WithMany("IncidentTags")
+                        .HasForeignKey("IncidentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_IncidentTags_Incidents");
+
+                    b.HasOne("ISIncidentTracker.Web.Models.Tag", "Tag")
+                        .WithMany("IncidentTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_IncidentTags_Tags");
+
+                    b.Navigation("Incident");
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("ISIncidentTracker.Web.Models.Category", b =>
                 {
                     b.Navigation("Incidents");
+                });
+
+            modelBuilder.Entity("ISIncidentTracker.Web.Models.Incident", b =>
+                {
+                    b.Navigation("IncidentTags");
+                });
+
+            modelBuilder.Entity("ISIncidentTracker.Web.Models.Tag", b =>
+                {
+                    b.Navigation("IncidentTags");
                 });
 
             modelBuilder.Entity("ISIncidentTracker.Web.Models.User", b =>

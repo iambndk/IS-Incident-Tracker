@@ -39,6 +39,11 @@ public class Incident
     public DateTime? OccurredDate { get; set; }
 
     /// <summary>
+    /// Срок решения инцидента.
+    /// </summary>
+    public DateTime? DueDate { get; set; }
+
+    /// <summary>
     /// Уровень критичности инцидента.
     /// </summary>
     public IncidentSeverity Severity { get; set; } = IncidentSeverity.Medium;
@@ -54,7 +59,6 @@ public class Incident
 
     /// <summary>
     /// Идентификатор категории инцидента (внешний ключ).
-    /// Связь N:1 (Многие инциденты к одной категории).
     /// </summary>
     public int CategoryId { get; set; }
 
@@ -65,7 +69,6 @@ public class Incident
 
     /// <summary>
     /// Идентификатор пользователя, сообщившего об инциденте (внешний ключ).
-    /// Связь N:1 (Многие инциденты к одному автору).
     /// </summary>
     public int ReportedById { get; set; }
 
@@ -76,7 +79,6 @@ public class Incident
 
     /// <summary>
     /// Идентификатор пользователя, ответственного за обработку (внешний ключ, опционально).
-    /// Связь N:1 (Многие инцидентов к одному ответственному).
     /// </summary>
     public int? AssignedToId { get; set; }
 
@@ -84,10 +86,6 @@ public class Incident
     /// Навигационное свойство: пользователь, ответственный за обработку.
     /// </summary>
     public User? AssignedTo { get; set; }
-
-    // ==========================================
-    // Поля решения
-    // ==========================================
 
     /// <summary>
     /// Дата и время разрешения инцидента.
@@ -110,4 +108,9 @@ public class Incident
     /// Дата и время последнего обновления записи.
     /// </summary>
     public DateTime? UpdatedAt { get; set; }
+
+    /// <summary>
+    /// Навигационное свойство: теги инцидента.
+    /// </summary>
+    public ICollection<IncidentTag>? IncidentTags { get; set; }
 }

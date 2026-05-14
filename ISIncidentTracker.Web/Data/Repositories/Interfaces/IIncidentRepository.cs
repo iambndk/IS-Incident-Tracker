@@ -9,12 +9,22 @@ namespace ISIncidentTracker.Web.Data.Repositories.Interfaces;
 public interface IIncidentRepository : IRepository<Incident>
 {
     /// <summary>
-    /// Получает инциденты с включенными связанными данными (Eager Loading).
+    /// Получает все инциденты с включенными связанными данными.
     /// </summary>
     Task<IEnumerable<Incident>> GetAllWithIncludesAsync();
 
     /// <summary>
-    /// Получает статистику инцидентов по критичности.
+    /// Получает статистику инцидентов по уровню критичности.
     /// </summary>
     Task<Dictionary<IncidentSeverity, int>> GetSeverityStatisticsAsync();
+
+    /// <summary>
+    /// Получает инциденты по статусу.
+    /// </summary>
+    Task<IEnumerable<Incident>> GetByStatusAsync(IncidentStatus status);
+
+    /// <summary>
+    /// Получает инциденты по диапазону дат.
+    /// </summary>
+    Task<IEnumerable<Incident>> GetByDateRangeAsync(DateTime from, DateTime to);
 }

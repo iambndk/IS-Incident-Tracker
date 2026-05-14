@@ -21,17 +21,22 @@ public enum IncidentStatus
     InProgress = 3,
 
     /// <summary>
+    /// Инцидент ожидает решения или подтверждения.
+    /// </summary>
+    Pending = 4,
+
+    /// <summary>
     /// Инцидент разрешен, применяются меры защиты.
     /// </summary>
-    Resolved = 4,
+    Resolved = 5,
 
     /// <summary>
     /// Инцидент закрыт после проверки и документирования.
     /// </summary>
-    Closed = 5,
+    Closed = 6,
 
     /// <summary>
     /// Инцидент отклонен как ложное срабатывание.
     /// </summary>
-    Rejected = 6
+    Rejected = 7
 }

@@ -75,15 +75,7 @@ else
                     <li class="list-group-item">
                         <strong>Назначен:</strong>
                         @(incident.AssignedTo?.FullName ?? "Не назначен")
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Дата разрешения:</strong>
-                        @(incident.ResolvedDate?.ToString("dd.MM.yyyy HH:mm") ?? "Не разрешен")
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Решение:</strong>
-                        @(incident.Resolution ?? "Не указано")
-                    </li>
+                    </li>   
                 </ul>
             </div>
         </div>

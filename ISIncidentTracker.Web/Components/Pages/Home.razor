@@ -1,7 +1,70 @@
-﻿@page "/"
+﻿@using ISIncidentTracker.Web.Services.Interfaces
+@using ISIncidentTracker.Web.Models.Enums
+@inject IIncidentService IncidentService
+@rendermode InteractiveServer
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Главная - IS Incident Tracker</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="px-4 py-5 my-5 text-center bg-light rounded-3">
+    <h1 class="display-5 fw-bold text-primary">
+        <i class="bi bi-shield-lock"></i> IS Incident Tracker
+    </h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">
+            Система учета и мониторинга инцидентов информационной безопасности
+        </p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="/incidents" class="btn btn-primary btn-lg px-4 gap-3">
+                <i class="bi bi-list-task"></i> Все инциденты
+            </a>
+            <a href="/incidents/create" class="btn btn-outline-secondary btn-lg px-4">
+                <i class="bi bi-plus-circle"></i> Создать инцидент
+            </a>
+        </div>
+    </div>
+</div>
 
-Welcome to your new app.
+@if (statistics != null && statistics.Any())
+{
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Статистика по критичности</h2>
+        </div>
+        
+        @foreach (var stat in statistics)
+        {
+            <div class="col-md-3 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">@stat.Key</h5>
+                        <p class="display-4 text-primary">@stat.Value</p>
+                        <small class="text-muted">инцидентов</small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info text-center">
+        <p class="mb-0">Статистика пока недоступна. Создайте первый инцидент!</p>
+    </div>
+}
+
+@code {
+    private Dictionary<IncidentSeverity, int>? statistics;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            statistics = await IncidentService.GetSeverityStatisticsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка загрузки статистики: {ex.Message}");
+            statistics = new Dictionary<IncidentSeverity, int>();
+        }
+    }
+}
